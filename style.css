@@ -1,0 +1,19 @@
+body{
+	background-color: #000;
+	color: #fff;
+	overflow: hidden;
+	cursor: none;
+}
+canvas{
+	position: absolute; left: 0px; top:0px;
+
+}
+
+@font-face{
+	font-family: 'aventura';
+	src: url("font/Aventura Nostra.ttf");
+}
+@font-face{
+	font-family: 'arno';
+	src: url("font/ArnoBold.otf");
+}
