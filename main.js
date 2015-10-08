@@ -4,8 +4,12 @@ var fps = 60;
 var gc = 1000, sc = 100;
 var font = "arno";
 
-window.onload=function(){
+$(document).ready(function(){
 	res();
+})
+
+window.onload=function(){
+	res(); G.loading = false;
 }
 
 function res(){
@@ -88,6 +92,7 @@ var Inv = {
 
 var G = {
 
+	loading: true,
 	v:2,
 	map:{
 		x:0,y:0
@@ -106,12 +111,23 @@ function draw(){
 
 	ctx1.clearRect(0,0,C1.width,C1.height);
 	
-	if( G.v == 0 ){ drawMaze() }
-	if( G.v == 1 ){ drawMap() }
-	if( G.v == 2 ){ drawShop() }
+	if( G.loading == true ){
+		drawLoad();
+	}else{
+		if( G.v == 0 ){ drawMaze() }
+		if( G.v == 1 ){ drawMap() }
+		if( G.v == 2 ){ drawShop() }
+	}
 	
 	drawMouse();
 	
+}
+
+function drawLoad(){
+	ctx1.fillStyle = "#fff";
+	ctx1.textAlign = "center";
+	ctx1.fillText("Loading.",Cw/2,Ch/2);
+	ctx1.textAlign = "left";
 }
 
 function drawShop(){
