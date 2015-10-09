@@ -1,11 +1,16 @@
 var C1 = document.getElementById("C1"); var ctx1 = C1.getContext("2d"); var Cw = C1.width, Ch = C1.height;
 var mouse = {x:0,y:0,cx:0,cy:0,lckick:false,mclick:false,rclick:false};
+var key = {W:false,A:false,S:false,D:false}
 var fps = 60;
 var gc = 1000, sc = 100;
 var font = "arno";
 
-window.onload=function(){
+$(document).ready(function(){
 	res();
+})
+
+window.onload=function(){
+	res(); G.loading = false;
 }
 
 function res(){
@@ -23,8 +28,15 @@ window.setInterval(function(){
 
 var P = {
 
-	x:300,y:300,hp:100,hpm:200,hpc:0,hps:60
+	x:0,y:0,hp:100,hpm:200,hpc:0,hps:60,
+	s:0.05,v:0,xv:0,yv:0
 
+}
+
+var M = {
+	
+	r:[]
+	
 }
 
 var shop = {
@@ -88,7 +100,8 @@ var Inv = {
 
 var G = {
 
-	v:2,
+	loading: true,
+	v:0,
 	map:{
 		x:0,y:0
 	}
@@ -106,12 +119,23 @@ function draw(){
 
 	ctx1.clearRect(0,0,C1.width,C1.height);
 	
-	if( G.v == 0 ){ drawMaze() }
-	if( G.v == 1 ){ drawMap() }
-	if( G.v == 2 ){ drawShop() }
+	if( G.loading == true ){
+		drawLoad();
+	}else{
+		if( G.v == 0 ){ drawMaze() }
+		if( G.v == 1 ){ drawMap() }
+		if( G.v == 2 ){ drawShop() }
+	}
 	
 	drawMouse();
 	
+}
+
+function drawLoad(){
+	ctx1.fillStyle = "#fff";
+	ctx1.textAlign = "center";
+	ctx1.fillText("Loading.",Cw/2,Ch/2);
+	ctx1.textAlign = "left";
 }
 
 function drawShop(){
@@ -236,39 +260,39 @@ function drawItems(sx,sy,sw,sh,a){
 
 function drawMaze(){
 	
-	drawPlayer(P.x,P.y);
+	//drawPlayer();
+	drawRooms();
 	
 }
 
-function drawPlayer(x,y){
-	s = 2;
+function drawRooms(){
+	tile = 30;
+	//drawMM();
+	drw(char_idle,(Cw/2)+(P.x*tile)-(char_idle.width),(Ch/2)+(P.y*tile)-(char_idle.height*2),2)
 	
-	drw(player_s,x-player_s.width,y-player_s.height,s);
-	drw(hp_s,x-54,y-player_s.height-40,s);
-	fs("#f20");
-	
-	if( (P.hp/P.hpm) > 1 ){ P.hp = P.hpm }
-	else if( (P.hp/P.hpm) < 0 ){ P.hp = 0 }
-	
-	ctx1.fillRect(x-(hp_s.width*(s/2))+(4*(s/2)),y-player_s.height-(hp_s.height*(s/2))-(25/(s/2)),(100*(s/2))*(P.hp/P.hpm),(6*(s/2)));
-	
-	stxt(15,"#f20"); ctx1.fillText(P.hp+"/"+P.hpm,x-50,y-player_s.height-39);
-	if( P.hp < P.hpm ){ if( P.hpc < 1 ){ P.hp++ ; P.hpc = P.hps }else{ P.hpc-- } };
-	
-	fs("#777"); ctx1.globalAlpha = 0.5;
-	ctx1.fillRect(x+70,y+50,60,2);
-	ctx1.fillRect(x+70,y+0,60,2);
-	ctx1.fillRect(x+70,y-50,60,2);
-	if( bounds(mouse.x,x+70,x+70+60) ){
-		if( mouse.y < y+75 && mouse.y > y+25 ){
-			ctx1.fillRect(mouse.x,y+40,2,20);
-		}else if( mouse.y <= y+25 && mouse.y >= y-25 ){
-			ctx1.fillRect(mouse.x,y-10,2,20);
-		}else if( mouse.y < y-25 && mouse.y > y-75 ){
-			ctx1.fillRect(mouse.x,y-60,2,20);
+}
+
+function drawMM(){
+	w = 20; mo = (w*M.r.length); w2 = 6; w3 = 6
+	fs("#222");
+	fr(Cw-mo-20,Ch-mo-20,mo,mo);
+	fs("#4f4");
+	for( i = 0; i < M.r.length; i++ ){
+		for( j = 0; j < M.r.length; j++ ){ R = M.r[i][j];
+			if( R.R ){
+				fr(Cw-mo+w*i+(w3/2)-20,Ch-mo+w*j+(w3/2)-20,w-w3,w-w3);
+				if( R.d[0] ){ fr(Cw-mo+w*i+(w2/2)-20,Ch-mo+w*j+0-20,w-w2,w-w2) }
+				if( R.d[1] ){ fr(Cw-mo+w*i+(w2/2)-20,Ch-mo+w*j+(w2)-20,w-w2,w-w2) }
+				if( R.d[2] ){ fr(Cw-mo+w*i+0-20,Ch-mo+w*j+(w2/2)-20,w-w2,w-w2) }
+				if( R.d[3] ){ fr(Cw-mo+w*i+(w2)-20,Ch-mo+w*j+(w2/2)-20,w-w2,w-w2) }
+			}
 		}
 	}
-	ctx1.globalAlpha = 1;
+}
+
+function drawPlayer(){
+	
+	
 	
 }
 
@@ -349,14 +373,22 @@ $('#C1').mouseup(function(e) {
 });
 
 window.onkeydown = function (e){
-	key = e.keyCode ? e.keyCode : e.which;
-		switch(key){
-			default: console.log(key); break;
+	k = e.keyCode ? e.keyCode : e.which;
+		switch(k){
+			case 87: /*W*/ key.W = true; break;
+			case 65: /*A*/ key.A = true; break;
+			case 83: /*S*/ key.S = true; break;
+			case 68: /*D*/ key.D = true; break;
+			default: console.log(k); break;
 		};
 }
 window.onkeyup = function (e){
-	key = e.keyCode ? e.keyCode : e.which;
-		switch(key){
+	k = e.keyCode ? e.keyCode : e.which;
+		switch(k){
+			case 87: /*W*/ key.W = false; break;
+			case 65: /*A*/ key.A = false; break;
+			case 83: /*S*/ key.S = false; break;
+			case 68: /*D*/ key.D = false; break;
 		}
 }
 window.oncontextmenu = function(){
@@ -385,7 +417,7 @@ C1.addEventListener('mousemove', function(evt) {
  });
  
  function scroll( e ){
-	if( G.v = 2 ){
+	if( G.v == 2 ){
 		if(e < 0) {
 			 //scroll down
 			if( shop.y[shop.m].scr<shop.y[shop.m].mx ){ shop.y[shop.m].scr++ }
