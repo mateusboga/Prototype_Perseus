@@ -5,6 +5,7 @@ var cur_s = new Image(); cur_s.src = "s/cur1.png";
 //var l1_s = new Image(); l1_s.src = "1.png";
 
 var player_s = new Image(); player_s.src = "s/player2.png";
+var char_idle = new Image(); char_idle.src = "s/c/1/idle1.png";
 var hp_s = new Image(); hp_s.src = "s/hpcount.png";
 
 
